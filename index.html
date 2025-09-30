@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur Prix Produit Artisan/Créateur</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #FAFAF8;
+            color: #2C2C2C;
+            line-height: 1.6;
+            padding-bottom: 100px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 40px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .header h1 {
+            color: #2C2C2C;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .sticky-result {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #2C2C2C 0%, #4A4A4A 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .sticky-result.show {
+            display: block;
+        }
+        
+        .sticky-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .sticky-price {
+            font-size: 36px;
+            font-weight: bold;
+        }
+        
+        .sticky-tiers {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+        }
+        
+        .tier {
+            text-align: center;
+        }
+        
+        .tier-label {
+            opacity: 0.8;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        
+        .tier-price {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2C2C2C;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #FAFAF8;
+        }
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-group label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #2C2C2C;
+            font-size: 14px;
+        }
+        
+        .input-group input,
+        .input-group select {
+            padding: 12px;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #2C2C2C;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .slider-group input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #E0E0E0;
+            outline: none;
+            margin-top: 8px;
+        }
+        
+        .slider-value {
+            text-align: center;
+            font-weight: 600;
+            color: #2C2C2C;
+            margin-top: 5px;
+        }
+        
+        .variants-section {
+            margin-top: 20px;
+        }
+        
+        .variant-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: end;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #2C2C2C;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1A1A1A;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #2C2C2C;
+            border: 1px solid #E0E0E0;
+        }
+        
+        .btn-secondary:hover {
+            background: #FAFAF8;
+        }
+        
+        .btn-danger {
+            background: #DC3545;
+            color: white;
+            padding: 8px 12px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .results {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: none;
+        }
+        
+        .results.show {
+            display: block;
+        }
+        
+        .result-card {
+            background: #FAFAF8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #E0E0E0;
+        }
+        
+        .result-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        
+        .result-label {
+            color: #666;
+        }
+        
+        .result-value {
+            font-weight: 600;
+            color: #2C2C2C;
+        }
+        
+        .tiers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .tier-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #E0E0E0;
+            text-align: center;
+        }
+        
+        .tier-card.standard {
+            border-color: #2C2C2C;
+            background: #FAFAF8;
+        }
+        
+        .tier-card h4 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .tier-card .price {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2C2C2C;
+        }
+        
+        .tier-card .description {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .market-indicator {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .market-indicator.in-range {
+            background: #D4EDDA;
+            color: #155724;
+        }
+        
+        .market-indicator.below {
+            background: #FFF3CD;
+            color: #856404;
+        }
+        
+        .market-indicator.above {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+        
+        .variants-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .variants-table th,
+        .variants-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #E0E0E0;
+        }
+        
+        .variants-table th {
+            background: #FAFAF8;
+            font-weight: 600;
+        }
+        
+        .product-sheet {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            display: none;
+        }
+        
+        .product-sheet.show {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .sticky-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .variant-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💎 Calculateur Prix Produit</h1>
+            <p>Pour créateurs & artisans — Fixez votre prix avec précision</p>
+        </div>
+
+        <!-- Matières & Production -->
+        <div class="form-section">
+            <h2 class="section-title">🛠️ Matières & Production (par unité)</h2>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="materiaux">Coût matières (€)</label>
+                    <input type="number" id="materiaux" placeholder="25.00" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="temps">Temps de fabrication (heures)</label>
+                    <input type="number" id="temps" placeholder="3.5" step="0.5" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="tauxHoraire">Taux horaire cible (€)</label>
+                    <input type="number" id="tauxHoraire" placeholder="25.00" step="1" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="perte">Perte/Déchet (%)</label>
+                    <input type="number" id="perte" placeholder="10" step="1" min="0" max="100">
+                </div>
+                <div class="input-group">
+                    <label for="soustraitance">Sous-traitance (€, optionnel)</label>
+                    <input type="number" id="soustraitance" placeholder="0" step="0.01" min="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Conditionnement & Expédition -->
+        <div class="form-section">
+            <h2 class="section-title">📦 Conditionnement & Expédition</h2>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="emballage">Emballage (€)</label>
+                    <input type="number" id="emballage" placeholder="3.50" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="poids">Poids (g)</label>
+                    <input type="number" id="poids" placeholder="250" step="1" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="expedition">Coût d'expédition moyen (€)</label>
+                    <input type="number" id="expedition" placeholder="5.50" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="assurance">Assurance/Fragile (€)</label>
+                    <input type="number" id="assurance" placeholder="0" step="0.01" min="0">
+                </div>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="expeditionClient">
+                <label for="expeditionClient">Expédition facturée au client (ne pas inclure dans le prix)</label>
+            </div>
+        </div>
+
+        <!-- Plateforme & Paiements -->
+        <div class="form-section">
+            <h2 class="section-title">💳 Plateforme & Paiements</h2>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="canal">Canal de vente</label>
+                    <select id="canal">
+                        <option value="etsy">Etsy</option>
+                        <option value="shopify">Shopify</option>
+                        <option value="instagram">Instagram/DM</option>
+                        <option value="local">Marché local</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="fraisPlateforme">Frais plateforme (%)</label>
+                    <input type="number" id="fraisPlateforme" placeholder="6.5" step="0.1" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="fraisFixes">Frais fixes par transaction (€)</label>
+                    <input type="number" id="fraisFixes" placeholder="0" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="tva">TVA (%)</label>
+                    <input type="number" id="tva" placeholder="20" step="0.1" min="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Positionnement & Collection -->
+        <div class="form-section">
+            <h2 class="section-title">🎨 Positionnement & Collection</h2>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="serie">Série</label>
+                    <select id="serie">
+                        <option value="unique">Pièce unique</option>
+                        <option value="petite">Petite série</option>
+                        <option value="collection">Collection</option>
+                    </select>
+                </div>
+                <div class="slider-group">
+                    <label for="coefMarque">Coefficient marque (notoriété, rareté, finition)</label>
+                    <input type="range" id="coefMarque" min="1.0" max="3.0" step="0.1" value="1.5">
+                    <div class="slider-value" id="coefValue">1.5x</div>
+                </div>
+                <div class="slider-group">
+                    <label for="demande">Demande estimée</label>
+                    <input type="range" id="demande" min="-10" max="10" step="1" value="0">
+                    <div class="slider-value" id="demandeValue">Normal (0%)</div>
+                </div>
+            </div>
+            <h3 style="margin-top: 20px; margin-bottom: 15px; font-size: 16px;">Concurrence (optionnel)</h3>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="concMin">Prix minimum (€)</label>
+                    <input type="number" id="concMin" placeholder="50" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="concMedian">Prix médian (€)</label>
+                    <input type="number" id="concMedian" placeholder="80" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="concMax">Prix maximum (€)</label>
+                    <input type="number" id="concMax" placeholder="120" step="0.01" min="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Variantes -->
+        <div class="form-section">
+            <h2 class="section-title">🔄 Variantes (optionnel)</h2>
+            <div class="variants-section" id="variantsContainer">
+                <div class="variant-row">
+                    <div class="input-group">
+                        <label>Nom variante (ex: Taille M, Bleu)</label>
+                        <input type="text" class="variant-name" placeholder="Taille M">
+                    </div>
+                    <div class="input-group">
+                        <label>Coût additif (€)</label>
+                        <input type="number" class="variant-cost" placeholder="5" step="0.01" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Temps additif (h)</label>
+                        <input type="number" class="variant-time" placeholder="0.5" step="0.1" min="0">
+                    </div>
+                    <button class="btn btn-danger" onclick="removeVariant(this)">✕</button>
+                </div>
+            </div>
+            <button class="btn btn-secondary" onclick="addVariant()">+ Ajouter une variante</button>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="calculate()">🚀 Calculer mon prix</button>
+            <button class="btn btn-secondary" onclick="resetForm()">🔄 Réinitialiser</button>
+            <button class="btn btn-secondary" onclick="copyProductSheet()">📋 Copier fiche produit</button>
+        </div>
+
+        <!-- Résultats -->
+        <div class="results" id="results">
+            <h2 class="section-title">📊 Résultats</h2>
+            
+            <div class="result-card">
+                <div class="result-row">
+                    <span class="result-label">Coût de revient (CDR)</span>
+                    <span class="result-value" id="cdr">—</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Prix HT base</span>
+                    <span class="result-value" id="prixHT">—</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Frais plateforme</span>
+                    <span class="result-value" id="fraisPlat">—</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Livraison incluse</span>
+                    <span class="result-value" id="livraisonInc">—</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">TVA</span>
+                    <span class="result-value" id="tvaVal">—</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Prix TTC recommandé</span>
+                    <span class="result-value" id="prixTTC">—</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Marge nette</span>
+                    <span class="result-value" id="marge">—</span>
+                </div>
+            </div>
+
+            <div id="marketIndicator"></div>
+
+            <h3 style="margin-top: 30px; margin-bottom: 15px;">💰 Paliers de prix</h3>
+            <div class="tiers-grid">
+                <div class="tier-card">
+                    <h4>Entrée</h4>
+                    <div class="price" id="tierEntree">—</div>
+                    <div class="description">Version simplifiée</div>
+                </div>
+                <div class="tier-card standard">
+                    <h4>Standard</h4>
+                    <div class="price" id="tierStandard">—</div>
+                    <div class="description">Prix recommandé</div>
+                </div>
+                <div class="tier-card">
+                    <h4>Collection</h4>
+                    <div class="price" id="tierCollection">—</div>
+                    <div class="description">Édition limitée</div>
+                </div>
+            </div>
+
+            <div id="variantsResults"></div>
+        </div>
+
+        <!-- Fiche produit -->
+        <div class="product-sheet" id="productSheet"></div>
+    </div>
+
+    <!-- Barre sticky -->
+    <div class="sticky-result" id="stickyResult">
+        <div class="sticky-content">
+            <div>
+                <div style="font-size: 14px; opacity: 0.9;">Prix TTC recommandé</div>
+                <div class="sticky-price" id="stickyPrice">—</div>
+            </div>
+            <div class="sticky-tiers">
+                <div class="tier">
+                    <div class="tier-label">Entrée</div>
+                    <div class="tier-price" id="stickyEntree">—</div>
+                </div>
+                <div class="tier">
+                    <div class="tier-label">Standard</div>
+                    <div class="tier-price" id="stickyStandard">—</div>
+                </div>
+                <div class="tier">
+                    <div class="tier-label">Collection</div>
+                    <div class="tier-price" id="stickyCollection">—</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function fmt(val) {
+            return parseFloat(val) || 0;
+        }
+
+        function fmtEuro(val) {
+            return val.toFixed(2) + ' €';
+        }
+
+        function addVariant() {
+            const container = document.getElementById('variantsContainer');
+            const row = document.createElement('div');
+            row.className = 'variant-row';
+            row.innerHTML = `
+                <div class="input-group">
+                    <input type="text" class="variant-name" placeholder="Nom variante">
+                </div>
+                <div class="input-group">
+                    <input type="number" class="variant-cost" placeholder="0" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <input type="number" class="variant-time" placeholder="0" step="0.1" min="0">
+                </div>
+                <button class="btn btn-danger" onclick="removeVariant(this)">✕</button>
+            `;
+            container.appendChild(row);
+            saveToLocalStorage();
+        }
+
+        function removeVariant(btn) {
+            btn.parentElement.remove();
+            saveToLocalStorage();
+        }
+
+        document.getElementById('coefMarque').addEventListener('input', function() {
+            document.getElementById('coefValue').textContent = this.value + 'x';
+        });
+
+        document.getElementById('demande').addEventListener('input', function() {
+            const val = parseInt(this.value);
+            let label = 'Normal';
+            if (val > 0) label = 'Forte (+' + val + '%)';
+            if (val < 0) label = 'Faible (' + val + '%)';
+            document.getElementById('demandeValue').textContent = label;
+        });
+
+        document.getElementById('canal').addEventListener('change', function() {
+            const fraisPlateforme = document.getElementById('fraisPlateforme');
+            const fraisFixes = document.getElementById('fraisFixes');
+            
+            switch(this.value) {
+                case 'etsy':
+                    fraisPlateforme.value = '6.5';
+                    fraisFixes.value = '0';
+                    break;
+                case 'shopify':
+                    fraisPlateforme.value = '2.9';
+                    fraisFixes.value = '0.25';
+                    break;
+                case 'instagram':
+                case 'local':
+                    fraisPlateforme.value = '0';
+                    fraisFixes.value = '0';
+                    break;
+            }
+        });
+
+        function calculate() {
+            const materiaux = fmt(document.getElementById('materiaux').value);
+            const temps = fmt(document.getElementById('temps').value);
+            const tauxHoraire = fmt(document.getElementById('tauxHoraire').value);
+            const perte = fmt(document.getElementById('perte').value);
+            const soustraitance = fmt(document.getElementById('soustraitance').value);
+            const emballage = fmt(document.getElementById('emballage').value);
+            const expedition = fmt(document.getElementById('expedition').value);
+            const assurance = fmt(document.getElementById('assurance').value);
+            const expeditionClient = document.getElementById('expeditionClient').checked;
+            const fraisPlateforme = fmt(document.getElementById('fraisPlateforme').value);
+            const fraisFixes = fmt(document.getElementById('fraisFixes').value);
+            const tva = fmt(document.getElementById('tva').value);
+            const coefMarque = fmt(document.getElementById('coefMarque').value);
+            const demande = fmt(document.getElementById('demande').value);
+            const concMin = fmt(document.getElementById('concMin').value);
+            const concMedian = fmt(document.getElementById('concMedian').value);
+            const concMax = fmt(document.getElementById('concMax').value);
+
+            const materiauxAjustes = materiaux * (1 + perte / 100);
+            const mainOeuvre = temps * tauxHoraire;
+            const cdr = materiauxAjustes + mainOeuvre + soustraitance + emballage;
+
+            let prixBase = cdr * coefMarque;
+            const fraisPlat = (prixBase * fraisPlateforme / 100) + fraisFixes;
+            let prixHT = prixBase + fraisPlat;
+
+            let livraisonInc = 0;
+            if (!expeditionClient) {
+                livraisonInc = expedition + assurance;
+                prixHT += livraisonInc;
+            }
+
+            if (concMin > 0 && concMax > 0) {
+                if (prixHT < concMin) {
+                    prixHT = concMin + (prixHT - concMin) * 0.3;
+                } else if (prixHT > concMax) {
+                    prixHT = concMax - (concMax - prixHT) * 0.3;
+                }
+            }
+
+            prixHT = prixHT * (1 + demande / 100);
+
+            const tvaVal = prixHT * (tva / 100);
+            const prixTTC = prixHT + tvaVal;
+
+            const margeEuro = prixHT - cdr - fraisPlat - livraisonInc;
+            const margePct = (margeEuro / prixHT) * 100;
+
+            const tierEntree = prixTTC * 0.9;
+            const tierStandard = prixTTC;
+            const tierCollection = prixTTC * 1.25;
+
+            document.getElementById('cdr').textContent = fmtEuro(cdr);
+            document.getElementById('prixHT').textContent = fmtEuro(prixHT);
+            document.getElementById('fraisPlat').textContent = fmtEuro(fraisPlat);
+            document.getElementById('livraisonInc').textContent = expeditionClient ? 'Non incluse' : fmtEuro(livraisonInc);
+            document.getElementById('tvaVal').textContent = fmtEuro(tvaVal);
+            document.getElementById('prixTTC').textContent = fmtEuro(prixTTC);
+            document.getElementById('marge').textContent = fmtEuro(margeEuro) + ' (' + margePct.toFixed(1) + '%)';
+
+            document.getElementById('tierEntree').textContent = fmtEuro(tierEntree);
+            document.getElementById('tierStandard').textContent = fmtEuro(tierStandard);
+            document.getElementById('tierCollection').textContent = fmtEuro(tierCollection);
+
+            document.getElementById('stickyPrice').textContent = fmtEuro(prixTTC);
+            document.getElementById('stickyEntree').textContent = fmtEuro(tierEntree);
+            document.getElementById('stickyStandard').textContent = fmtEuro(tierStandard);
+            document.getElementById('stickyCollection').textContent = fmtEuro(tierCollection);
+            document.getElementById('stickyResult').classList.add('show');
+
+            const marketDiv = document.getElementById('marketIndicator');
+            if (concMin > 0 && concMax > 0) {
+                let marketClass = 'in-range';
+                let marketText = '✓ Prix dans la fourchette du marché';
+                
+                if (prixTTC < concMin) {
+                    marketClass = 'below';
+                    marketText = '⚠️ Prix sous le marché';
+                } else if (prixTTC > concMax) {
+                    marketClass = 'above';
+                    marketText = '💎 Prix premium au-dessus du marché';
+                }
+                
+                marketDiv.innerHTML = `<div class="market-indicator ${marketClass}">${marketText}</div>`;
+            } else {
+                marketDiv.innerHTML = '';
+            }
+
+            const variantRows = document.querySelectorAll('.variant-row');
+            let variantsHTML = '';
+            
+            if (variantRows.length > 0 && variantRows[0].querySelector('.variant-name').value) {
+                variantsHTML = '<h3 style="margin-top: 30px; margin-bottom: 15px;">🔄 Prix par variante</h3>';
+                variantsHTML += '<table class="variants-table"><thead><tr><th>Variante</th><th>CDR</th><th>Prix TTC</th></tr></thead><tbody>';
+                
+                variantRows.forEach(row => {
+                    const name = row.querySelector('.variant-name').value;
+                    const cost = fmt(row.querySelector('.variant-cost').value);
+                    const time = fmt(row.querySelector('.variant-time').value);
+                    
+                    if (name) {
+                        const varCDR = cdr + cost + (time * tauxHoraire);
+                        const varPrixBase = varCDR * coefMarque;
+                        const varFrais = (varPrixBase * fraisPlateforme / 100) + fraisFixes;
+                        let varPrixHT = varPrixBase + varFrais;
+                        
+                        if (!expeditionClient) {
+                            varPrixHT += livraisonInc;
+                        }
+                        
+                        varPrixHT = varPrixHT * (1 + demande / 100);
+                        const varTVA = varPrixHT * (tva / 100);
+                        const varPrixTTC = varPrixHT + varTVA;
+                        
+                        variantsHTML += `<tr><td>${name}</td><td>${fmtEuro(varCDR)}</td><td>${fmtEuro(varPrixTTC)}</td></tr>`;
+                    }
+                });
+                
+                variantsHTML += '</tbody></table>';
+            }
+            
+            document.getElementById('variantsResults').innerHTML = variantsHTML;
+
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+
+            saveToLocalStorage();
+        }
+
+        function copyProductSheet() {
+            const prixTTC = document.getElementById('prixTTC').textContent;
+            const serie = document.getElementById('serie').options[document.getElementById('serie').selectedIndex].text;
+            const materiaux = document.getElementById('materiaux').value || '—';
+            const temps = document.getElementById('temps').value || '—';
+            const poids = document.getElementById('poids').value || '—';
+            
+            const sheet = `
+═══════════════════════════════════════
+          FICHE PRODUIT
+═══════════════════════════════════════
+
+📦 PRODUIT
+   Série : ${serie}
+   Poids : ${poids}g
+
+💎 MATÉRIAUX & FABRICATION
+   Matières : ${materiaux}€
+   Temps de fabrication : ${temps}h
+   
+💰 PRIX
+   Prix public TTC : ${prixTTC}
+
+📝 ENTRETIEN
+   [À personnaliser selon votre produit]
+
+🎨 PERSONNALISATION
+   [Options disponibles à détailler]
+
+═══════════════════════════════════════
+            `;
+
+            document.getElementById('productSheet').textContent = sheet;
+            document.getElementById('productSheet').classList.add('show');
+
+            navigator.clipboard.writeText(sheet).then(() => {
+                alert('✓ Fiche produit copiée dans le presse-papiers !');
+            });
+        }
+
+        function resetForm() {
+            if (confirm('Réinitialiser tous les champs ?')) {
+                document.querySelectorAll('input[type="number"], input[type="text"]').forEach(input => {
+                    input.value = '';
+                });
+                document.getElementById('expeditionClient').checked = false;
+                document.getElementById('coefMarque').value = 1.5;
+                document.getElementById('demande').value = 0;
+                document.getElementById('coefValue').textContent = '1.5x';
+                document.getElementById('demandeValue').textContent = 'Normal (0%)';
+                document.getElementById('results').classList.remove('show');
+                document.getElementById('stickyResult').classList.remove('show');
+                document.getElementById('productSheet').classList.remove('show');
+                
+                const container = document.getElementById('variantsContainer');
+                container.innerHTML = `
+                    <div class="variant-row">
+                        <div class="input-group">
+                            <label>Nom variante (ex: Taille M, Bleu)</label>
+                            <input type="text" class="variant-name" placeholder="Taille M">
+                        </div>
+                        <div class="input-group">
+                            <label>Coût additif (€)</label>
+                            <input type="number" class="variant-cost" placeholder="5" step="0.01" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Temps additif (h)</label>
+                            <input type="number" class="variant-time" placeholder="0.5" step="0.1" min="0">
+                        </div>
+                        <button class="btn btn-danger" onclick="removeVariant(this)">✕</button>
+                    </div>
+                `;
+                
+                localStorage.removeItem('productPricingData');
+            }
+        }
+
+        function saveToLocalStorage() {
+            const data = {
+                materiaux: document.getElementById('materiaux').value,
+                temps: document.getElementById('temps').value,
+                tauxHoraire: document.getElementById('tauxHoraire').value,
+                perte: document.getElementById('perte').value,
+                soustraitance: document.getElementById('soustraitance').value,
+                emballage: document.getElementById('emballage').value,
+                poids: document.getElementById('poids').value,
+                expedition: document.getElementById('expedition').value,
+                assurance: document.getElementById('assurance').value,
+                expeditionClient: document.getElementById('expeditionClient').checked,
+                canal: document.getElementById('canal').value,
+                fraisPlateforme: document.getElementById('fraisPlateforme').value,
+                fraisFixes: document.getElementById('fraisFixes').value,
+                tva: document.getElementById('tva').value,
+                serie: document.getElementById('serie').value,
+                coefMarque: document.getElementById('coefMarque').value,
+                demande: document.getElementById('demande').value,
+                concMin: document.getElementById('concMin').value,
+                concMedian: document.getElementById('concMedian').value,
+                concMax: document.getElementById('concMax').value
+            };
+            
+            localStorage.setItem('productPricingData', JSON.stringify(data));
+        }
+
+        function loadFromLocalStorage() {
+            const data = localStorage.getItem('productPricingData');
+            if (data) {
+                const parsed = JSON.parse(data);
+                Object.keys(parsed).forEach(key => {
+                    const el = document.getElementById(key);
+                    if (el) {
+                        if (el.type === 'checkbox') {
+                            el.checked = parsed[key];
+                        } else {
+                            el.value = parsed[key];
+                        }
+                    }
+                });
+                
+                document.getElementById('coefValue').textContent = parsed.coefMarque + 'x';
+                const demVal = parseInt(parsed.demande);
+                let label = 'Normal';
+                if (demVal > 0) label = 'Forte (+' + demVal + '%)';
+                if (demVal < 0) label = 'Faible (' + demVal + '%)';
+                document.getElementById('demandeValue').textContent = label;
+            }
+        }
+
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('change', saveToLocalStorage);
+        });
+
+        window.addEventListener('load', loadFromLocalStorage);
+    </script>
+</body>
+</html>
